@@ -18,10 +18,6 @@
             window.location = baseUrl + "settings.php";
         }
 
-        function build() {
-            window.location = baseUrl + "build.php";
-        }
-
         function getPageName() {
             var url = window.location.pathname;
             var filename = url.substring(url.lastIndexOf('/') + 1);
@@ -77,20 +73,7 @@
                             <span data-feather="zap"></span>
                             Add Gate
                         </a>
-                    </li>  
-                    <li class="nav-item">
-                        <a class="nav-link" id="scopeToExisting" href="javascript:addGate();">
-                            <span data-feather="filter"></span>
-                            Scope To Existing Tables
-                            <p>devNote: this is where you will be able to start Rest interfacing with existing tables already on db</p>
-                        </a>
-                    </li>  
-                    <li class="nav-item">
-                        <a class="nav-link" id="build" href="javascript:build();">
-                            <span data-feather="play"></span>
-                            Build Services
-                        </a>
-                    </li>                      
+                    </li>                   
                     <li class="nav-item">
                         <a class="nav-link" id="settings" href="javascript:settings();">
                             <span data-feather="settings"></span>
@@ -106,13 +89,6 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                 <h1 class="h2" id="pageName"></h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group mr-2">
-                        <button class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button class="btn btn-sm btn-outline-secondary">Export</button>
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                        <span data-feather="calendar"></span>
-                        This week
-                    </button>
+                    
                 </div>
             </div>
