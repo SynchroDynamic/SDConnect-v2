@@ -1,9 +1,27 @@
+<?php
+use \Phppot\Member;
+session_start();
+if (!empty($_SESSION["userId"])) {
+    require_once __DIR__ . '/login/class/Member.php';
+    $member = new Member();
+    $memberResult = $member->getMemberById($_SESSION["userId"]);
+    //echo "MEMEBER RESULTS : " . implode("::", $memberResult);
+    if (!empty($memberResult[0]["username"])) {
+        $displayName = $memberResult[0]["username"];
+    } else {
+        $displayName = $memberResult[0]["username"];
+    }
+} else {
+    include_once dirname(__DIR__) . '/inc/sd-config1.php';
+    echo '<meta http-equiv="refresh" content="0;url=' . \SDC::URL . \SDC::SUBFOLDER . 'sd-admin/login/">';
+}
+?>
+
 <!doctype html>
 <html lang="en">    
     <?php
-    //echo $_SERVER['DOCUMENT_ROOT'];
     readfile(dirname(__FILE__) . "/inc/head.html");
-    echo "<body onload='getPageName()'>"; 
+    echo "<body onload='getPageName()'>";
     readfile(dirname(__FILE__) . "/inc/layout.html");
     $message = "";
     if (isset($_POST['install'])) {
@@ -142,5 +160,15 @@
 <script>
     feather.replace()
 </script>     
+<script>
+    $(document).ready(function () {
+        $('#logout').on('click', function () {
+            location.href = '/sd/sd-admin/login/logout.php';
+        });
+    });
+
+    $('#inas').append('<a href="#"><?php echo $displayName; ?></a>');
+
+</script>
 </body>
 </html>

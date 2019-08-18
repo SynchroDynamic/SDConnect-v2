@@ -1,4 +1,25 @@
 <?php
+
+use \Phppot\Member;
+session_start();
+if (!empty($_SESSION["userId"])) {
+    require_once __DIR__ . '/login/class/Member.php';
+    $member = new Member();
+    $memberResult = $member->getMemberById($_SESSION["userId"]);
+    //echo "MEMEBER RESULTS : " . implode("::", $memberResult);
+    if (!empty($memberResult[0]["username"])) {
+        $displayName = $memberResult[0]["username"];
+    } else {
+        $displayName = $memberResult[0]["username"];
+    }
+} else {
+    include_once dirname(__DIR__) . '/inc/sd-config1.php';
+    echo '<meta http-equiv="refresh" content="0;url=' . \SDC::URL . \SDC::SUBFOLDER . 'sd-admin/login/">';
+}
+
+
+
+
 include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
 ?>
 <!doctype html>
@@ -16,31 +37,30 @@ include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
                 <tr>
                     <th>#</th>
                     <th>Gate Name</th>
-                    <th>Status</th>
                     <th>Manage</th>
                     <th>Changed</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                //Move to Functions
+//Move to Functions
                 $gates = \admin\Functions::getGates();
                 $gateCount = count($gates);
-
+//echo $gateCount;
                 $tableRows = "";
                 for ($i = 0; $i < $gateCount; $i++) {
                     $tableRows = "<tr>";
                     $tableRows .= "<td>" . $gates[$i]['id'] . "</td>";
                     $tableRows .= "<td>" . $gates[$i]['gateName'] . "</td>";
-                    $tableRows .= "<td>" . $gates[$i]['status'] . "</td>";
 
-                    $tableRows .= "<td><a class='nav-link' style='display: inline-block;' href='add.php?id=" . $gates[$i]['id'] . "&gate=" . $gates[$i]["gateName"] . "' data-toggle='tooltip' data-placement='top' title='Add a Transaction'>";
-                    $tableRows .= "<span data-feather='edit'></span></a>"
-                            . "<a class='nav-link' style='display: inline-block;' href='transactions.php?id=" . $gates[$i]['id'] . "&gate=" . $gates[$i]["gateName"] . "' data-toggle='tooltip' data-placement='top' title='View All Transactions'>"
-                            . "<span data-feather='list'></span></a>"
-                            . "<a class='nav-link' style='display: inline-block;' href='delete.php?id=" . $gates[$i]['id'] . "&gate=" . $gates[$i]["gateName"] . "' data-toggle='tooltip' data-placement='top' title='Delete Gate'>"
-                            . "<span data-feather='delete'></span></a></td>";
-
+                    $tableRows .= "<td>";
+                    $tableRows .= ""
+                            . ""
+                            . "<a class='nav-link' style='display: inline-block;' href='makeGate.php?id=" . $gates[$i]['id'] . "&gate=" . $gates[$i]["gateName"] . "' data-toggle='tooltip' data-placement='top' title='Delete Gate'>"
+                            . "<span data-feather='edit'></span></a>"
+                            /* . "<a class='nav-link' style='display: inline-block;' href='delete.php?id=" . $gates[$i]['id'] . "&gate=" . $gates[$i]["gateName"] . "' data-toggle='tooltip' data-placement='top' title='Delete Gate'>"
+                              . "<span data-feather='delete'></span></a> */ . "</td>";
+                    //This delete button set, but no functionality added
                     $tableRows .= "<td>" . $gates[$i]['changed'] . "</td></tr>";
                     echo $tableRows;
                 }
@@ -66,5 +86,17 @@ include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
 <script>
     feather.replace()
 </script>    
+
+<script>
+    $(document).ready(function () {
+        $('#logout').on('click', function () {
+            location.href = '/sd/sd-admin/login/logout.php';
+        });
+    });
+
+    $('#inas').append('<a href="#"><?php echo $displayName; ?></a>');
+
+</script>
+
 </body>
 </html>

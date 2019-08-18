@@ -1,55 +1,77 @@
 <!doctype html>
 <html lang="en">    
-<?php
+    <?php
     //echo $_SERVER['DOCUMENT_ROOT'];
     readfile(dirname(__FILE__) . "/inc/head.html");
 
+
+    if (isset($_POST['setadmin'])) {
+        include_once dirname(__DIR__) . '/sd-admin/login/class/Member.php';
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $reg = new \Phppot\Member();
+        $reg->addUser($username, $password);
+        echo $_GET['url'] . "/" . $_GET['sub'] . '/login/">';
+        echo '<meta http-equiv="refresh" content="0;url=' . $_GET['url'] . "/" . $_GET['sub'] . '/sd-admin/login/">';
+    }
+
     $message = "";
     if (isset($_POST['install'])) {
+        $url = $_POST['url'];
         $dbName = $_POST['dbName'];
         $uName = $_POST['uName'];
         $pass = $_POST['pass'];
         $host = $_POST['host'];
-        $prefix = $_POST['prefix'];
         $rPath = $_POST['rPath'];
-        $rDir = "/" . $_POST['rDir'];
+        $sub = $_POST['sub'];
         $salt = $_POST['salt'];
 
-        $message = "name=" . $dbName . " uName=" . $uName . " pass=" . $pass . " host=" . $host . " prefix=" . $prefix;
+        $message = "name=" . $dbName . " uName=" . $uName . " pass=" . $pass . " host=" . $host;
         echo $message;
 
-        $fp = fopen($_SERVER['DOCUMENT_ROOT'] . $rDir . '/inc/sd-config1.php', 'w');
+        $fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/" . $sub . '/inc/sd-config1.php', 'w');
 
-        $config = "<?php \n\n"
-                . "class SDC {\n\n"
-                . "//Navigation\n"
-                . "const ROOT_PATH = '$rPath';\n"
-                . "const SERVER_FOLDER = '/SERVERS/';\n"
-                . "const CONTROLLER_PATH = '/Controller/GateController.php';\n"
-                . "//Data Connection\n"
-                . "const IP = '$host';\n"
-                . "const DATABASE_NAME = '$dbName';\n"
-                . "const DB_USERNAME = '$uName';\n"
-                . "const DB_PASS = '$pass';\n"
-                . "//Encryption\n"
-                . "const SESS_CIPHER = 'aes-128-cbc';\n"
-                . "const KEYWORD = '$salt';\n\n"
-                . "}";
+        $config = '<?php ' . "\n";
+        $config .= 'class SDC {' . "\n";
+        $config .= '//URL' . "\n";
+        $config .= 'const URL = "' . $url . '/";' . "\n";
+        $config .= '//Navigation' . "\n";
+        $config .= 'const ROOT_PATH = "' . $rPath . '";' . "\n";
+        $config .= 'const SUBFOLDER = "' . $sub . '/";' . "\n";
+        $config .= 'const SERVER_FOLDER = "SERVERS/";' . "\n";
+        $config .= 'const CONTROLLER_PATH = "/GateController.php";' . "\n";
+        $config .= '//Data Connection' . "\n";
+        $config .= 'const IP = "' . $host . '";' . "\n";
+        $config .= 'const DATABASE_NAME = "' . $dbName . '";' . "\n";
+        $config .= 'const DB_USERNAME = "' . $uName . '";' . "\n";
+        $config .= 'const DB_PASS = "' . $pass . '";' . "\n";
+        $config .= '//Encryption' . "\n";
+        $config .= 'const SESS_CIPHER = "aes-128-cbc";' . "\n";
+        $config .= 'const KEYWORD = "' . $salt . '";' . "\n";
+        $config .= "}";
 
         fwrite($fp, $config);
         fclose($fp);
-        
-        
-        //include_once $rPath . $rDir . '/inc/sd-config1.php';
-        include_once $rPath . $rDir . "/SERVERS/SHARED/ServerDatabase.php";
-        
+
+
+        include_once dirname(__FILE__, 2) . '/inc/sd-config1.php';
+        include_once $rPath . "/" . $sub . "/SERVERS/SHARED/ServerDatabase.php";
+
         $conn = new \ServerDatabase();
         $conn->getConnection();
-        $status = $conn->send("select count(*) from information_schema.tables where table_schema = database();");        
-        $conn->closeConnection();
-        echo $status->fetchColumn();
+        $conn->send(file_get_contents(dirname(__FILE__) . '/schema/schema.sql'));
 
- 
+        $status = $conn->send("select count(*) from information_schema.tables where table_schema = database();");
+        $conn->closeConnection();
+        $cout = $status->rowCount();
+        echo "COUNT " . $cout;
+        if ($cout > 0) {
+            $_GET['install'] = null;
+            //echo '&url=' . $url . "/" . $sub . '">';
+            echo '<meta http-equiv="refresh" content="0;url=' . $url . "/" . $sub . '/sd-admin/install.php?step=' . 2 . '&url=' . $url . "&sub=" . $sub . '">';
+        } else {
+            echo 'Install Error!';
+        }
     }
     ?>
 
@@ -57,72 +79,98 @@
 
         <div class="container-fluid">      
 
-            <form class="text-center border border-light p-5" method="POST" action="">
+            <?php
+            $step = isset($_GET['step']) ? $_GET['step'] : 0;
+            if ($step == "2") {
+                ?>
+                <form class="text-center border border-light p-5" method="POST" action="">
 
-                <p class="h4 mb-4">SynchroDynamic REST API Creator Install</p>
-                <div class="form-group row">
-                    <label for="dbName" class="col-sm-2 col-form-label">Database Name</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="dbName" name="dbName" placeholder="sd-admin">
+                    <p class="h4 mb-4">SynchroDynamic - Create Admin Account</p>
+                    <div class="form-group row">
+                        <label for="username" class="col-sm-2 col-form-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="admin">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="uName" class="col-sm-2 col-form-label">Username</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="uName" name="uName" placeholder="root">
+                    <div class="form-group row">
+                        <label for="password" class="col-sm-2 col-form-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="uName" name="password" placeholder="pass">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="pass" class="col-sm-2 col-form-label">Password</label>
-                    <div class="col-sm-10">
-                        <input type="password" class="form-control" id="pass" name="pass" placeholder="pass">
+                    <button class="btn btn-info btn-block my-4" type="submit" name="setadmin">Add Admin</button>
+                </form>
+                <?php
+            } else {
+                ?>
+
+
+                <form class="text-center border border-light p-5" method="POST" action="">
+
+                    <p class="h4 mb-4">SynchroDynamic Database Management System</p>
+                    <div class="form-group row">
+                        <label for="url" class="col-sm-2 col-form-label">URL</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control"id="url" name="url" value="<?php echo!empty($_SERVER['HTTPS']) ? 'https' : 'http' . '://' . $_SERVER['HTTP_HOST']; ?>">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="host" class="col-sm-2 col-form-label">Database Host IP and Database Port String</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="host" name="host" value="127.0.0.1:3306">
+                    <div class="form-group row">
+                        <label for="dbName" class="col-sm-2 col-form-label">Database Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="dbName" name="dbName" placeholder="sd-admin">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="prefix" class="col-sm-2 col-form-label">Table Prefix</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="prefix" name="prefix" value="sd_">
+                    <div class="form-group row">
+                        <label for="uName" class="col-sm-2 col-form-label">Username</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="uName" name="uName" placeholder="root">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="pass" class="col-sm-2 col-form-label">Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="pass" name="pass" placeholder="pass">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="host" class="col-sm-2 col-form-label">Database Host IP and Database Port String</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="host" name="host" value="127.0.0.1:3306">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="rPath" class="col-sm-2 col-form-label">Root Directory</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="rPath" name="rPath" value="<?php echo $_SERVER['DOCUMENT_ROOT'];
+                ?>">
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label for="sub" class="col-sm-2 col-form-label">Sub-Folder</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="sub" name="sub" placeholder="Leave Blank if in ROOT Directory">
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label for="salt" class="col-sm-2 col-form-label">Salt Keyword</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="salt" name="salt" placeholder="A unique sequence of characters">
+                        </div>
+
                     </div>
 
+                    <!-- Sign in button -->
+                    <button class="btn btn-info btn-block my-4" type="submit" name="install">Install Now</button>
+                </form>
+
+                <div class="alert alert-danger" role="alert">
+                    This file will be maintained until you delete it. You can save a copy off your server, and delete it when you are sure
+                    that everything is installed correctly. Lastly, Change the file permission of the /inc folder in the root directory.
                 </div>
 
-                <div class="form-group row">
-                    <label for="rPath" class="col-sm-2 col-form-label">Root Directory</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="rPath" name="rPath" value="<?php echo $_SERVER['DOCUMENT_ROOT'];
-    ?>">
-                    </div>
-
-                </div>
-                <div class="form-group row">
-                    <label for="rDir" class="col-sm-2 col-form-label">Root Directory</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="rDir" name="rDir" placeholder="the folder SD is installed(No slashes)">
-                    </div>
-
-                </div>
-                <div class="form-group row">
-                    <label for="salt" class="col-sm-2 col-form-label">Salt Keyword</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="salt" name="salt" placeholder="A unique sequence of characters">
-                    </div>
-
-                </div>
-
-                <!-- Sign in button -->
-                <button class="btn btn-info btn-block my-4" type="submit" name="install">Install Now</button>
-            </form>
-
-            <div class="alert alert-danger" role="alert">
-                This file will be maintained until you delete it. You can save a copy off your server, and delete it when you are sure
-                that everything is installed correctly. Lastly, Change the file permission of the /inc folder in the root directory.
-            </div>
+            <?php } ?>
         </main>
     </div>
 </div>

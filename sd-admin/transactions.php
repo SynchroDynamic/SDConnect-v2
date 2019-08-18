@@ -1,32 +1,56 @@
-<?php ?>
+<?php
+use \Phppot\Member;
+session_start();
+if (!empty($_SESSION["userId"])) {
+    require_once __DIR__ . '/login/class/Member.php';
+    $member = new Member();
+    $memberResult = $member->getMemberById($_SESSION["userId"]);
+    //echo "MEMEBER RESULTS : " . implode("::", $memberResult);
+    if (!empty($memberResult[0]["username"])) {
+        $displayName = $memberResult[0]["username"];
+    } else {
+        $displayName = $memberResult[0]["username"];
+    }
+} else {
+    include_once dirname(__DIR__) . '/inc/sd-config1.php';
+    echo '<meta http-equiv="refresh" content="0;url=' . \SDC::URL . \SDC::SUBFOLDER . 'sd-admin/login/">';
+}
+?>
 
 <!doctype html>
 <html lang="en">
 
-    <?php
-    include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
+<?php
+session_start();
+if (empty($_SESSION["userId"])) {
+    include_once dirname(__DIR__) . '/inc/sd-config1.php';
+    // $root .= !empty($_SERVER['HTTPS']) ? 'https' : 'http';
+    $root = 'http://' . $_SERVER['HTTP_HOST'];
+    echo '<meta http-equiv="refresh" content="0;url=' . $root . '/' . \SDC::SUBFOLDER . 'sd-admin/login/">';
+}
+include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
 
-    readfile(dirname(__FILE__) . "/inc/head.html");
-    echo "<body onload='getPageName()'>";
-    readfile(dirname(__FILE__) . "/inc/layout.html");
-    if (isset($_GET['id'])) {
-        $id = $_GET['id'];
-        $gate = $_GET['gate'];
-    } else {
-        die('404');
-    }
-    $transactions = \admin\Functions::getTransactionsForGate($id);
-    $count = count($transactions);
-    ?>
+readfile(dirname(__FILE__) . "/inc/head.html");
+echo "<body onload='getPageName()'>";
+readfile(dirname(__FILE__) . "/inc/layout.html");
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $gate = $_GET['gate'];
+} else {
+    die('404');
+}
+$transactions = \admin\Functions::getTransactionsForGate($id);
+$count = count($transactions);
+?>
 
 
 
     <div class="table-responsive">
-        <?php
-        if ($count == 0) {
-            echo "Nothing Yet";
-        } else {
-            ?>
+<?php
+if ($count == 0) {
+    echo "Nothing Yet";
+} else {
+    ?>
             <table class="table table-striped table-sm">
                 <thead>
                     <tr>
@@ -39,29 +63,29 @@
                 </thead>
                 <tbody id='incomingTBody'>
 
-                    <?php
-                    for ($i = 0; $i < $count; $i++) {
-                        $tranId = $transactions[$i]['id'];
-                        $tranName = $transactions[$i]['name'];
-                        $tranType = $transactions[$i]['type'];
-                        $tranPar = $transactions[$i]['hasParameters'];
-                        $tranData = $transactions[$i]['hasData'];
+    <?php
+    for ($i = 0; $i < $count; $i++) {
+        $tranId = $transactions[$i]['id'];
+        $tranName = $transactions[$i]['name'];
+        $tranType = $transactions[$i]['type'];
+        $tranPar = $transactions[$i]['hasParameters'];
+        $tranData = $transactions[$i]['hasData'];
 
 
-                        echo "<tr id='clickable$i'>";
-                        echo "<td>$tranId</td><td>$tranName</td>";
-                        echo "<td>$tranType</td><td>$tranPar</td>";
-                        echo "<td>$tranData</td>";
-                        echo "</tr>";
-                    }
-                    ?>
+        echo "<tr id='clickable$i'>";
+        echo "<td>$tranId</td><td>$tranName</td>";
+        echo "<td>$tranType</td><td>$tranPar</td>";
+        echo "<td>$tranData</td>";
+        echo "</tr>";
+    }
+    ?>
 
                     <tr>
                         <td></td>
                     </tr>
                 </tbody>
             </table>
-        <?php } ?>
+<?php } ?>
         <button type="button" class="btn btn-warning" id="addTrans"><span data-feather='plus-circle'></span> Transaction</button>
     </main>
 </div>
@@ -109,6 +133,16 @@ for ($x = 0; $x < $count; $x++) {
         });
 
     });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#logout').on('click', function () {
+            location.href = '/sd/sd-admin/login/logout.php';
+        });
+    });
+
+    $('#inas').append('<a href="#"><?php echo $displayName; ?></a>');
+
 </script>
 </body>
 </html>

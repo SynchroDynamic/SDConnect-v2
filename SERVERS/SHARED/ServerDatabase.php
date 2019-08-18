@@ -71,6 +71,8 @@ namespace {
             $query .= " FROM " . $tableName;
 
             $query .= $this->concatWhereClause($whereCol, $where, $whereOperator);
+            
+            //echo $query;
 
             $data = $this->send($query);
 
@@ -91,8 +93,7 @@ namespace {
             return $data;
         }
 
-        public function createTable($name, $parameters) {
-
+        public function createTableNotUserDependent($name, $parameters) {
 
             $query = "CREATE TABLE IF NOT EXISTS $name(";
 
@@ -102,7 +103,31 @@ namespace {
             $query .= ",PRIMARY KEY (id)";
             $query .= ")  ENGINE=INNODB;";
 
-            $this->send($query);
+            return $this->send($query);
+        }
+
+        public function createTableUniqueUser($name, $parameters) {
+
+            $query = "CREATE TABLE IF NOT EXISTS $name(";
+
+            $query .= "id INT AUTO_INCREMENT PRIMARY KEY, uid INT NOT NULL,"
+                    . $parameters;
+
+            $query .= ",UNIQUE (uid)";
+            $query .= ")  ENGINE=INNODB;";
+
+            return $this->send($query);
+        }
+
+        public function createTableMultipleEntryUser($name, $parameters) {
+
+            $query = "CREATE TABLE IF NOT EXISTS $name(";
+
+            $query .= "id INT AUTO_INCREMENT PRIMARY KEY, uid INT NOT NULL,"
+                    . $parameters;
+            $query .= ")  ENGINE=INNODB;";
+
+            return $this->send($query);
         }
 
         /*            Sub Functions   
@@ -112,10 +137,14 @@ namespace {
          *  out how the above works              */
 
         public function send($query) {
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
+            try {
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+                return $stmt;
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
             // execute query
-            return $stmt;
         }
 
 //>> Use this to send special queries Straight From Data Access Object
@@ -173,11 +202,9 @@ namespace {
                     $stmt->bindParam($i + 1, $values[$i]);
                 }
 
-                if ($stmt->execute()) {
-                    return true;
-                }
-                return implode(", ", $stmt->errorInfo());
-                //return $query;
+                
+                $stmt->execute();
+                return $stmt;
             } catch (Exception $e) {
                 return "update error " . $e;
             }

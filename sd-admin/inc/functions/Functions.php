@@ -32,6 +32,27 @@ namespace admin {
             return $twenty;
         }
 
+        public static function getGateByName($name) {
+            $conn = new \ServerDatabase();
+            $conn->getConnection();
+            $rows = $conn->send("SELECT `id`, `gateName`, `status`, `changed` FROM `gates` WHERE `gateName` = '" . $name . "'");
+            $conn->closeConnection();
+            $twenty = array();
+            $count = 0;
+            while ($row = $rows->fetch(\PDO::FETCH_ASSOC)) {
+                extract($row);
+
+                $record = array(
+                    "id" => $id,
+                    "gateName" => $gateName,
+                    "status" => $status,
+                    "changed" => $changed
+                );
+                $twenty[$count++] = $record;
+            }
+            return $twenty;
+        }
+
         public static function getTablesAndCols() {
             $final = array();
             $finalCount = 0;
@@ -56,6 +77,36 @@ namespace admin {
             }
             $conn->closeConnection();
             return $final;
+        }
+
+        public static function getTablesAndColsByName($name) {
+            $final = array();
+            $finalCount = 0;
+            $conn = new \ServerDatabase();
+            $conn->getConnection();
+
+
+            $cols = $conn->send("DESCRIBE " . $name);
+            $colCount = $cols->rowCount();
+            //echo $colCount;
+            $temp = array(
+                $name
+            );
+            $currentCount = 1;
+            while ($row = $cols->fetch(\PDO::FETCH_ASSOC)) {
+                extract($row);
+                $tempPiece = array(
+                  
+                    "Field" => $Field,
+                    "Type" => $Type
+                );
+                $temp[$currentCount++] = $tempPiece;
+                
+            }
+           
+           // echo implode("::", $final);
+            $conn->closeConnection();
+            return $temp;
         }
 
         public static function addIncoming(array $dataArray) {
