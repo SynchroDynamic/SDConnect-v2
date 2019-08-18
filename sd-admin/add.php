@@ -193,7 +193,8 @@
         );
 
         $transactionid = \admin\Functions::addGeneral($id, $dataArray);
-        echo '<meta http-equiv="refresh" content="0;url=http://localhost:8081/SynchroDynamicRESTAPICreator/sd-admin/transactions.php?id=' . $id . '&gate=' . $gate . '">';
+        include_once dirname(__DIR__) . '/inc/sd-config1.php';
+        echo '<meta http-equiv="refresh" content="0;url='. \SDC::URL . \SDC::SUBFOLDER .'sd-admin/transactions.php?id=' . $id . '&gate=' . $gate . '">';
         //echo "<script>alert('$transactionid');</script>";
         //echo "<script>location.reload(true);</script>";
         //echo "added " . $transactionAdded;

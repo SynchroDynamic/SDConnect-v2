@@ -23,12 +23,6 @@ if (!empty($_SESSION["userId"])) {
 <html lang="en">
 
     <?php
-    if (empty($_SESSION["userId"])) {
-        include_once dirname(__DIR__) . '/inc/sd-config1.php';
-        // $root .= !empty($_SERVER['HTTPS']) ? 'https' : 'http';
-        $root = 'http://' . $_SERVER['HTTP_HOST'];
-        echo '<meta http-equiv="refresh" content="0;url=' . $root . '/' . \SDC::SUBFOLDER . 'sd-admin/login/">';
-    }
     $count = 1;
     include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
     readfile(dirname(__FILE__) . "/inc/head.html");
@@ -127,8 +121,10 @@ if (!empty($_SESSION["userId"])) {
 
         if (isset($_POST['everything'])) {
 
-            deleteDir(dirname(__FILE__, 2) . "/SERVERS/" . $name);
-            Functions::deleteGate($id, $name);
+            if (isset($name)) {
+                deleteDir(dirname(__FILE__, 2) . "/SERVERS/" . $name);
+                Functions::deleteGate($id, $name);
+            }
         }
 
 
@@ -311,7 +307,17 @@ if (!empty($_SESSION["userId"])) {
 
 <?php echo $arrString; ?>
 <?php echo $typeString; ?>
-        $('#gateTitle').text('EDIT GATE');
+
+        var url = new URL(location.href);
+        var gate = url.searchParams.get("gate");
+        if (gate !== null) {
+            $('#gateTitle').text('EDIT TABLE');
+        } else {
+            $('#gateTitle').text('ADD GATE');
+        }
+        
+
+
         $('#gName').val('<?php echo $tableName; ?>');
         $('#userD').val('<?php echo $savedStatus; ?>');
         if (typeof pars != 'undefined') {

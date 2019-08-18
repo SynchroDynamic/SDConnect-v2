@@ -23,6 +23,15 @@
             var filename = url.substring(url.lastIndexOf('/') + 1);
             var fileParts = filename.split(".");
             var pageName = fileParts[0].length > 0 ? fileParts[0] : "";
+            if (pageName === "makeGate") {
+                var url = new URL(location.href);
+                var gate = url.searchParams.get("gate");
+                if (gate !== null) {
+                    pageName = "Table Manager";
+                } else {
+                    pageName = "Table Creator";
+                }
+            }
 
             document.getElementById("pageName").innerHTML = pageName.toUpperCase();
 
@@ -49,7 +58,7 @@
 
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap" id="inas">
-          
+
         </li>
         <li class="nav-item text-nowrap">
             <a class="nav-link" href="#" id="logout">Sign out</a>
@@ -89,6 +98,6 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                 <h1 class="h2" id="pageName"></h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    
+
                 </div>
             </div>
