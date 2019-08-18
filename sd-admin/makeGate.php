@@ -31,7 +31,7 @@ if (!empty($_SESSION["userId"])) {
 
     if (isset($_POST['addGate'])) {
         $count = (int) $_POST['count'];
-        echo "COUNT: " . $count;
+        //echo "COUNT: " . $count;
         $gate = $_POST['gName'];
         $userDependence = $_POST['userD'];
 
@@ -43,7 +43,7 @@ if (!empty($_SESSION["userId"])) {
             }
             $pName = $_POST['pName' . $i];
             $pType = "";
-            echo $_POST['inputState' . $i];
+            //echo $_POST['inputState' . $i];
             switch ($_POST['inputState' . $i]) {
                 case "varchar":
                     $pType = "VARCHAR(" . $_POST['length' . $i] . ")";
@@ -108,8 +108,8 @@ if (!empty($_SESSION["userId"])) {
         $config2 = \Processor\ServerBuilder::buildGate($gate);
         fwrite($GateController, $config2);
         fclose($GateController);
-
-        //echo '<meta http-equiv="refresh" content="0;url=http://localhost:8081/SynchroDynamicRESTAPICreator/sd-admin/">';
+        include_once dirname(__DIR__) . '/inc/sd-config1.php';
+        echo '<meta http-equiv="refresh" content="0;url=' . \SDC::URL . \SDC::SUBFOLDER . 'sd-admin/">';
     }
     $arrString = "";
     $typeString = "";
@@ -119,11 +119,31 @@ if (!empty($_SESSION["userId"])) {
     if ((int) $id > 0) {
         $name = $_GET['gate'];
 
-        if (isset($_POST['everything'])) {
+        if (isset($_POST['delGate'])) {
 
             if (isset($name)) {
-                deleteDir(dirname(__FILE__, 2) . "/SERVERS/" . $name);
-                Functions::deleteGate($id, $name);
+                $delDir = deleteDir(dirname(__FILE__, 2) . "/SERVERS/" . $name);
+                if ($delDir) {
+                    echo '<script>alert("Gate Deleted Successfully!");</script>';
+                } else {
+                    echo '<script>alert("Gate Delete Failure!");</script>';
+                }
+            }
+        } else if (isset($_POST['everything'])) {
+            if (isset($name)) {
+                $delDir = deleteDir(dirname(__FILE__, 2) . "/SERVERS/" . $name);
+                $delTable = \admin\Functions::deleteGate($id, $name);
+                if ($delDir && $delTable) {
+                    include_once dirname(__DIR__) . '/inc/sd-config1.php';
+                    echo '<meta http-equiv="refresh" content="0;url=' . \SDC::URL . \SDC::SUBFOLDER . 'sd-admin/">';
+                } else {
+                    if (!$delDir) {
+                        echo '<script>alert("Gate Delete Failure!");</script>';
+                    }
+                    if (!$delTable) {
+                        echo '<script>alert("Table Delete Failure!");</script>';
+                    }
+                }
             }
         }
 
@@ -155,7 +175,7 @@ if (!empty($_SESSION["userId"])) {
 
     function deleteDir($dirPath) {
         if (!is_dir($dirPath)) {
-            throw new InvalidArgumentException("$dirPath must be a directory");
+            return false;
         }
         if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
             $dirPath .= '/';
@@ -169,6 +189,7 @@ if (!empty($_SESSION["userId"])) {
             }
         }
         rmdir($dirPath);
+        return true;
     }
     ?>
 
@@ -315,7 +336,7 @@ if (!empty($_SESSION["userId"])) {
         } else {
             $('#gateTitle').text('ADD GATE');
         }
-        
+
 
 
         $('#gName').val('<?php echo $tableName; ?>');

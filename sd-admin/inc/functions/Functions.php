@@ -32,6 +32,27 @@ namespace admin {
             return $twenty;
         }
 
+        public static function deleteGate($id, $name) {
+            $conn = new \ServerDatabase();
+            $conn->getConnection();
+            $delGate = $conn->delete("gates", array("gateName"), array("'" . $name . "'"), array("="));
+            if ($delGate->rowCount() > 0) {
+                $conn->send("DROP TABLE $name;");
+                $stillThere = $conn->select($name, "id", array("1"), array(), array());
+
+                if ($stillThere->rowCount() > 0) {
+                    $conn->closeConnection();
+                    //echo 'Table Not Deleted!';
+                } else {
+                    return true;
+                }
+            } else {
+                //echo 'Gate Not Deleted!';
+            }
+            $conn->closeConnection();
+            return false;
+        }
+
         public static function getGateByName($name) {
             $conn = new \ServerDatabase();
             $conn->getConnection();
@@ -96,15 +117,13 @@ namespace admin {
             while ($row = $cols->fetch(\PDO::FETCH_ASSOC)) {
                 extract($row);
                 $tempPiece = array(
-                  
                     "Field" => $Field,
                     "Type" => $Type
                 );
                 $temp[$currentCount++] = $tempPiece;
-                
             }
-           
-           // echo implode("::", $final);
+
+            // echo implode("::", $final);
             $conn->closeConnection();
             return $temp;
         }

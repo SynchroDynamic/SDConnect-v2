@@ -139,9 +139,6 @@
         }
         $stmt = \admin\Functions::addOutgoingWhereStatements($whereArray, $outgoingIds);
 
-        //echo $stmt;
-        //echo '<meta http-equiv="refresh" content="0;url=http://localhost:8081/SynchroDynamicRESTAPICreator/sd-admin/add.php?id=' . $id . '&gate=' . $gate . '&tid=' . $tid . '">';
-        //ship to db
         $transactions = \admin\Functions::getTransactionData($tid);
         $tValues = \admin\Functions::getTablesAndCols();
 
