@@ -1,6 +1,6 @@
 <?php
 namespace Phppot;
-
+include_once dirname(__DIR__, 3). '/SERVERS/SHARED/ServerDatabase.php';
 /**
  * Generic datasource class for handling DB operations.
  * Uses MySqli and PreparedStatements.
@@ -12,13 +12,6 @@ class DataSource
 
     // PHP 7.1.0 visibility modifiers are allowed for class constants.
     // when using above 7.1.0, declare the below constants as private
-    const HOST = '127.0.0.1:3306';
-
-    const USERNAME = 'root';
-
-    const PASSWORD = '';
-
-    const DATABASENAME = 'test1';
 
     private $conn;
 
@@ -45,7 +38,7 @@ class DataSource
      */
     public function getConnection()
     {
-        $conn = new \mysqli(self::HOST, self::USERNAME, self::PASSWORD, self::DATABASENAME);
+        $conn = new \mysqli(\DataConnection::h(), \DataConnection::u(), \DataConnection::p(), \DataConnection::d());
         
         if (mysqli_connect_errno()) {
             trigger_error("Problem with connecting to database.");

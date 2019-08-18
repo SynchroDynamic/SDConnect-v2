@@ -1,6 +1,7 @@
 <?php
 
 use \Phppot\Member;
+
 session_start();
 if (!empty($_SESSION["userId"])) {
     require_once __DIR__ . '/login/class/Member.php';
@@ -90,7 +91,14 @@ include_once dirname(__DIR__) . '/sd-admin/inc/functions/Functions.php';
 <script>
     $(document).ready(function () {
         $('#logout').on('click', function () {
-            location.href = '/sd/sd-admin/login/logout.php';
+            var baseUrl = getUrl.protocol + "//" + getUrl.host;
+            for (var i = 1; i < path.length - 1; i += 1) {
+                baseUrl += "/" + path[i];
+                //console.log(path[i]);
+            }
+            baseUrl += "/";
+            //alert(baseUrl);
+            location.href = baseUrl + "/login/logout.php";
         });
     });
 

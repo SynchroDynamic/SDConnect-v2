@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 use \Phppot\Member;
 
@@ -87,11 +89,11 @@ if (!empty($_SESSION["userId"])) {
 
         //ADD TO DB
         $date = date("Y-m-d H:i:s");
-        $columns1 = array("id", "gateName", "status", "changed");
-        $values = array("NULL", $gate, $userDependence, $date);
-        $conn->insert("gates", $columns1, $values);
+        $columns1 = array("gateName", "status", "changed");
+        $values = array($gate, $userDependence, $date);
+        $status = $conn->insert("gates", $columns1, $values);
         $conn->closeConnection();
-        //echo $status->errorInfo();
+        echo implode(" : ", $status->errorInfo());
         //
         //
         //Add directory for gate transactions

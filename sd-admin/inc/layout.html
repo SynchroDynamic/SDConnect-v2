@@ -3,7 +3,14 @@
     <script>
 
         var getUrl = window.location;
-        var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/sd-admin/";
+
+        var path = getUrl.pathname.split('/');
+        var baseUrl = getUrl.protocol + "//" + getUrl.host;
+        for (var i = 1; i < path.length - 1; i += 1) {
+            baseUrl += "/" + path[i];
+            //console.log(path[i]);
+        }
+        baseUrl += "/";
 
         //var base_url = window.location.origin;
 

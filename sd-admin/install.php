@@ -1,10 +1,26 @@
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+?>
+
 <!doctype html>
 <html lang="en">    
     <?php
     //echo $_SERVER['DOCUMENT_ROOT'];
     readfile(dirname(__FILE__) . "/inc/head.html");
 
+    $newFileName = '/var/www/your/file.txt';
 
+    if (!is_writable(dirname(__FILE__, 2))) {
+        echo dirname(dirname(__FILE__, 2)) . ' must be writable!!!' . "\n";
+        echo 'CURRENT OWNER   : ' . posix_getpwuid(fileowner(dirname(dirname(__FILE__, 2))))['name'] . "\n";
+        echo 'CHANGE OWNER TO : ' . exec('whoami') . "\n";
+        echo 'In a Terminal you will need to change directory permission for this directory. Try:' . "\n";
+        echo 'sudo chown -R www-data:www-data ' . dirname(dirname(__FILE__, 2));
+    } else {
+
+        echo 'WRITABLE!';
+    }
     if (isset($_POST['setadmin'])) {
         include_once dirname(__DIR__) . '/sd-admin/login/class/Member.php';
         $username = $_POST['username'];
@@ -28,8 +44,9 @@
 
         $message = "name=" . $dbName . " uName=" . $uName . " pass=" . $pass . " host=" . $host;
         echo $message;
-
-        $fp = fopen($_SERVER['DOCUMENT_ROOT'] . "/" . $sub . '/inc/sd-config1.php', 'w');
+        echo dirname(__FILE__, 3);
+        mkdir(dirname(__FILE__, 3) . "/" . $sub . '/inc');
+        $fp = fopen(dirname(__FILE__, 3) . "/" . $sub . '/inc/sd-config1.php', 'w');
 
         $config = '<?php ' . "\n";
         $config .= 'class SDC {' . "\n";
@@ -55,18 +72,20 @@
 
 
         include_once dirname(__FILE__, 2) . '/inc/sd-config1.php';
-        include_once $rPath . "/" . $sub . "/SERVERS/SHARED/ServerDatabase.php";
+        include_once dirname(__FILE__, 2) . "/SERVERS/SHARED/ServerDatabase.php";
 
         $conn = new \ServerDatabase();
         $conn->getConnection();
         $conn->send(file_get_contents(dirname(__FILE__) . '/schema/schema.sql'));
-
+        echo dirname(__FILE__) . '/schema/schema.sql';
         $status = $conn->send("select count(*) from information_schema.tables where table_schema = database();");
         $conn->closeConnection();
         $cout = $status->rowCount();
+
         echo "COUNT " . $cout;
+
         if ($cout > 0) {
-            $_GET['install'] = null;
+            $_POST['install'] = null;
             //echo '&url=' . $url . "/" . $sub . '">';
             echo '<meta http-equiv="refresh" content="0;url=' . $url . "/" . $sub . '/sd-admin/install.php?step=' . 2 . '&url=' . $url . "&sub=" . $sub . '">';
         } else {
