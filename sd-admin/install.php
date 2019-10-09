@@ -104,7 +104,7 @@ error_reporting(E_ALL);
                 ?>
                 <form class="text-center border border-light p-5" method="POST" action="">
 
-                    <p class="h4 mb-4">SynchroDynamic - Create Admin Account</p>
+                    <p class="h4 mb-4">SynchroDynamic Connection - Create Admin Account Part 2</p>
                     <div class="form-group row">
                         <label for="username" class="col-sm-2 col-form-label">Username</label>
                         <div class="col-sm-10">
@@ -126,7 +126,7 @@ error_reporting(E_ALL);
 
                 <form class="text-center border border-light p-5" method="POST" action="">
 
-                    <p class="h4 mb-4">SynchroDynamic Database Management System</p>
+                    <p class="h4 mb-4">SynchroDynamic Connection - Installation Part1</p>
                     <div class="form-group row">
                         <label for="url" class="col-sm-2 col-form-label">URL</label>
                         <div class="col-sm-10">

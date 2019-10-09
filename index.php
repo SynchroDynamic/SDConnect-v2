@@ -8,10 +8,11 @@ $count = 0;
 
 $json = file_get_contents('php://input');
 $data = json_decode($json);
-//echo "COUNT " . count($data);
+//echo "COUNT " . $json;
 if (isset($data)) {
-    for ($i = 0; $i < count($data); $i++) {
-        $pathSplit[$count++] = $data[i];
+    foreach ($data as $name => $value) {
+        $pathSplit[$count++] = $value;
+        //echo "$name: $value\n";
     }
 }
 

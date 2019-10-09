@@ -19,7 +19,7 @@ class GatewayController {
     //*****************************************MULTIPLE TABLES ON ONE SERVER Can 
 
     static function init($path, array $postArray) {
-        echo 'HELLO';
+        //echo 'HELLO';
         // Check if path is available or not empty        
         if (isset($path)) {//To be a REST Call, you need to have a path sequence
             // Do a path split
@@ -29,7 +29,7 @@ class GatewayController {
             die('404: This is not a browser accessible site'); //you are trying to axis the INDEX File
         }
 
-        echo "STUFF " ;//. $pSplit[1];
+        //echo "STUFF " ;//. $pSplit[1];
         
         if ($pSplit[0] == "sd-admin" || $pSplit[1] == "install.php" || $pSplit[1] == "login") {
             header("Location: $path");

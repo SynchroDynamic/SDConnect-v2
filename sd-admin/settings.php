@@ -100,7 +100,7 @@ if (isset($_POST['update'])) {
 
             <form class="text-center border border-light p-5" method="POST" action="">
 
-                <p class="h4 mb-4">SynchroDynamic Database Management System</p>
+                <p class="h4 mb-4">SynchroDynamic Connection - Settings</p>
                 <div class="form-group row">
                     <label  for="url" class="col-sm-2 col-form-label">URL</label>
                     <div class="col-sm-10">
